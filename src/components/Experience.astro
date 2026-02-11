@@ -24,57 +24,61 @@ const experiences = [
 ];
 ---
 
-<section id="experience" class="relative bg-dark text-white py-32 px-6 overflow-hidden">
-  <div class="max-w-4xl mx-auto">
+<section id="experience" class="relative bg-dark text-white">
+  <!-- 
+    The "track" needs to be TALL (e.g., 300vh or 400vh).
+    As you scroll DOWN this tall track, we keep the content PINNED to the screen.
+    We translate the vertical scroll progress into horizontal movement.
+  -->
+  <div class="scroll-container h-[400vh] relative">
     
-    <!-- Section Header -->
-    <div class="text-center mb-24 reveal-on-scroll">
-      <h2 class="text-primary font-medium tracking-widest uppercase mb-4 text-sm">Career Path</h2>
-      <p class="font-display text-4xl md:text-6xl font-bold">
-        Professional <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Journey</span>
-      </p>
-    </div>
-
-    <!-- Timeline Container -->
-    <div class="relative">
-      <!-- Vertical Line (Absolute) -->
-      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-white/10 transform md:-translate-x-1/2"></div>
-
-      <!-- Experience Items -->
-      <div class="space-y-24">
+    <!-- The Sticky Window: This stays fixed in view while we scroll through the container -->
+    <div class="sticky-viewport sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
+      
+      <!-- Static Header Overlay -->
+      <div class="absolute top-12 left-6 md:left-20 z-20 pointer-events-none">
+        <h2 class="text-primary font-medium tracking-widest uppercase mb-4 text-sm">Career Path</h2>
+        <p class="font-display text-4xl md:text-6xl font-bold">
+          Professional <span class="text-transparent bg-clip-text bg-linear-to-r from-white to-gray-500">Journey</span>
+        </p>
+      </div>
+      
+      <!-- The Moving Train of Cards -->
+      <div class="cards-train flex items-center pl-[50vw] pr-[50vw] gap-[20vw]">
         {experiences.map((exp, index) => (
-          <div class={`relative flex flex-col md:flex-row gap-8 items-center reveal-on-scroll ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+          <div class="experience-card relative shrink-0 w-[80vw] md:w-[60vw] max-w-[800px] transition-all duration-500 ease-out p-8 md:p-12 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md">
             
-            <!-- Timeline Dot -->
-            <div class="absolute left-[-5px] md:left-1/2 w-3 h-3 bg-primary rounded-full transform md:-translate-x-1/2 z-10 shadow-[0_0_15px_rgba(129,140,248,0.6)]">
-              <div class="absolute inset-0 bg-primary/50 animate-ping rounded-full"></div>
-            </div>
+            <!-- Glow Effect -->
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-0 card-glow transition-opacity duration-500"></div>
 
-            <!-- Content Half -->
-            <div class="w-full md:w-1/2 pl-8 md:pl-0 md:pr-16 md:text-right">
-              <div class={`${index % 2 === 0 ? 'md:text-left md:pl-16 md:pr-0' : ''}`}>
-                <span class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-primary uppercase bg-primary/10 rounded-full border border-primary/20">
+            <div class="relative z-10 flex flex-col gap-6">
+              <div class="flex items-center justify-between">
+                <span class="px-4 py-2 text-sm font-bold tracking-wider text-primary uppercase bg-primary/10 rounded-full border border-primary/20">
                   {exp.period}
                 </span>
-                <h3 class="text-2xl md:text-3xl font-display font-bold mb-1">{exp.role}</h3>
-                <p class="text-lg text-white/60 mb-4 font-medium">{exp.company}</p>
-                <p class="text-gray-400 leading-relaxed mb-6">
-                  {exp.description}
-                </p>
-                
-                <!-- Tech Stack Tags -->
-                <div class={`flex flex-wrap gap-2 ${index % 2 === 0 ? '' : 'md:justify-end'}`}>
-                  {exp.technologies.map(tech => (
-                    <span class="px-3 py-1 text-xs bg-white/5 text-gray-300 rounded border border-white/10 hover:border-white/30 transition-colors cursor-default">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
+                <span class="text-8xl font-display font-bold text-white/5 absolute -top-10 right-0 pointer-events-none">
+                  0{index + 1}
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-3xl md:text-6xl font-display font-bold mb-2 text-white">{exp.role}</h3>
+                <p class="text-xl md:text-2xl text-secondary font-light">{exp.company}</p>
+              </div>
+
+              <p class="text-gray-300 text-lg md:text-xl leading-relaxed max-w-3xl">
+                {exp.description}
+              </p>
+
+              <!-- Tech Stack -->
+              <div class="flex flex-wrap gap-3 mt-4">
+                {exp.technologies.map(tech => (
+                  <span class="px-4 py-2 text-sm bg-black/30 text-gray-400 rounded-lg border border-white/5">
+                    {tech}
+                  </span>
+                ))}
               </div>
             </div>
-
-            <!-- Empty Half for Layout Balance -->
-            <div class="hidden md:block w-1/2"></div>
           </div>
         ))}
       </div>
@@ -82,40 +86,113 @@ const experiences = [
   </div>
 </section>
 
-<style>
-  /* Base state for reveal animation */
-  .reveal-on-scroll {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s cubic-bezier(0.17, 0.55, 0.55, 1);
+<script>
+  function initExperience() {
+    const container = document.querySelector('.scroll-container') as HTMLElement;
+    const train = document.querySelector('.cards-train') as HTMLElement;
+    const cards = document.querySelectorAll('.experience-card');
+
+    if (!container || !train) return;
+
+    function update() {
+      // 1. Get dimensions
+      const rect = container.getBoundingClientRect();
+      const containerHeight = rect.height;
+      const windowHeight = window.innerHeight;
+
+      // 2. Calculate how far we are into the section
+      // The "active" scroll distance is the container height minus the viewport height
+      const maxScroll = containerHeight - windowHeight;
+      // Use negative rect.top because as we scroll down, top becomes negative. 
+      // Movement should start when top hits 0 (reaches top of viewport).
+      const currentScroll = -rect.top;
+
+      // 3. Normalize progress (0 to 1)
+      // We start at 0 (top of section hits top of viewport)
+      // We end at 1 (bottom of section hits bottom of viewport)
+      let progress = currentScroll / maxScroll;
+      
+      // Clamp progress between 0 and 1
+      progress = Math.max(0, Math.min(progress, 1));
+
+      // 4. Move the train
+      // We calculate exact positions to center the first card at progress 0 
+      // and the last card at progress 1 (Center-to-Center scroll).
+      const firstCard = cards[0] as HTMLElement;
+      const lastCard = cards[cards.length - 1] as HTMLElement;
+
+      if (firstCard && lastCard) {
+        // Get center points of first/last cards relative to the container
+        const startX = firstCard.offsetLeft + (firstCard.offsetWidth / 2);
+        const endX = lastCard.offsetLeft + (lastCard.offsetWidth / 2);
+        const centerScreen = window.innerWidth / 2;
+
+        // Calculate the transform needed to put the card center at screen center
+        // Formula: translate = screenCenter - cardX
+        const startTranslate = centerScreen - startX;
+        const endTranslate = centerScreen - endX;
+
+        // Interpolate
+        const currentTranslate = startTranslate + (endTranslate - startTranslate) * progress;
+        train.style.transform = `translateX(${currentTranslate}px)`;
+      }
+
+      // 5. Update Card Focus
+      const centerScreen = window.innerWidth / 2;
+      
+      cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const distFromCenter = Math.abs(centerScreen - cardCenter);
+        
+        // Scale: 1 at center, 0.8 at edges
+        // Opacity: 1 at center, 0.3 at edges
+        // The divisor (500) controls how "wide" the focus area is
+        let intensity = 1 - (distFromCenter / window.innerWidth);
+        intensity = Math.max(0, Math.min(intensity, 1)); // Clamp 0-1
+        
+        // Non-linear ease for sharper focus
+        const ease = intensity * intensity; 
+        
+        const scale = 0.8 + (0.3 * ease); // Range 0.8 -> 1.1
+        const opacity = 0.3 + (0.7 * ease); // Range 0.3 -> 1.0
+
+        (card as HTMLElement).style.transform = `scale(${scale})`;
+        (card as HTMLElement).style.opacity = `${opacity}`;
+        (card as HTMLElement).style.zIndex = distFromCenter < 200 ? '10' : '1';
+        
+        const glow = card.querySelector('.card-glow') as HTMLElement;
+        if (glow) {
+          glow.style.opacity = `${ease}`;
+        }
+      });
+
+      requestAnimationFrame(update);
+    }
+    
+    // Create an observer to only run the loop when visible 
+    // (Optimization: stop loop when not scrolling or off-screen)
+    // For simplicity and smoothness, we run raf loop constantly, 
+    // but in production you might want to throttle this.
+    update();
   }
 
-  /* Active state when in view */
-  .reveal-on-scroll.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+  // Run immediately and re-run on resize for robustness
+  initExperience();
+  window.addEventListener('resize', initExperience);
+</script>
+
+<style>
+  .cards-train {
+    /* Critical: Use 'will-change' to tell browser to optimize for transform */
+    will-change: transform;
+    /* Ensure no transition on transform to keep it 1:1 with scroll */
+    transition: none; 
+  }
+  
+  .experience-card {
+    will-change: transform, opacity;
+    /* Smooth out the scale/opacity changes slightly */
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out; 
   }
 </style>
-
-<script>
-  // Setup Intersection Observer
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.2
-  };
-
-  const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target); // Only animate once
-      }
-    });
-  }, observerOptions);
-
-  // Target all elements with the reveal class
-  document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
-    observer.observe(element);
-  });
-</script>
