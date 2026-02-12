@@ -59,7 +59,7 @@ const stackItems = [
 
 const getSizeClasses = (size: string) => {
   switch(size) {
-    case 'large': return 'md:col-span-2 md:row-span-2 min-h-[400px]';
+    case 'large': return 'row-span-2 md:col-span-2 md:row-span-2 min-h-[400px]';
     case 'medium': return 'md:col-span-2 md:row-span-1 min-h-[200px]';
     case 'small': return 'md:col-span-1 md:row-span-1 min-h-[200px]';
     default: return 'md:col-span-1 md:row-span-1';
@@ -108,7 +108,7 @@ const getSizeClasses = (size: string) => {
               </div>
 
               {item.size === 'large' && (
-                <div class="hidden md:flex gap-2">
+                <div class="flex flex-wrap justify-end gap-2">
                    <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400">Microservices</span>
                    <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400">Event-Driven</span>
                    <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400">Application Insights</span>

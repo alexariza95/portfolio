@@ -47,20 +47,20 @@ const experiences = [
   <div class="scroll-container h-[400vh] relative">
     
     <!-- The Sticky Window: This stays fixed in view while we scroll through the container -->
-    <div class="sticky-viewport sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
+    <div class="sticky-viewport sticky top-0 h-screen overflow-hidden flex flex-col items-start justify-center md:items-stretch">
       
       <!-- Static Header Overlay -->
-      <div class="absolute top-12 left-6 md:left-20 z-20 pointer-events-none">
-        <h2 class="text-primary font-medium tracking-widest uppercase mb-4 text-sm">Career Path</h2>
+      <div class="relative z-50 px-6 pt-12 pb-4 md:absolute md:top-12 md:left-20 md:p-0 pointer-events-none">
+        <h2 class="text-primary font-medium tracking-widest uppercase mb-2 text-xs md:text-sm md:mb-4">Career Path</h2>
         <p class="font-display text-4xl md:text-6xl font-bold">
           Professional <span class="text-transparent bg-clip-text bg-linear-to-r from-white to-gray-500">Journey</span>
         </p>
       </div>
       
       <!-- The Moving Train of Cards -->
-      <div class="cards-train flex items-center pl-[50vw] pr-[50vw] gap-[20vw]">
+      <div class="cards-train flex items-center pl-[50vw] pr-[50vw] gap-[10vw] md:gap-[20vw] flex-1 md:flex-none">
         {experiences.map((exp, index) => (
-          <div class="experience-card relative shrink-0 w-[80vw] md:w-[60vw] max-w-[800px] transition-all duration-500 ease-out p-8 md:p-12 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md">
+          <div class="experience-card relative shrink-0 w-[90vw] md:w-[60vw] max-w-[800px] transition-all duration-500 ease-out p-6 md:p-12 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md">
             
             <!-- Glow Effect -->
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-0 card-glow transition-opacity duration-500"></div>
