@@ -42,5 +42,5 @@ To run this project locally:
 
 Feel free to reach out to me for collaboration or just to say hi!
 
-- **LinkedIn**: [Alex Ariza](https://www.linkedin.com/in/alexariza/)
+- **LinkedIn**: [Alex Ariza](https://www.linkedin.com/in/alexariza95/)
 - **GitHub**: [alexariza95](https://github.com/alexariza95)
