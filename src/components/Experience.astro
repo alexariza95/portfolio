@@ -47,7 +47,7 @@ const experiences = [
   <div class="scroll-container h-[400vh] relative">
     
     <!-- The Sticky Window: This stays fixed in view while we scroll through the container -->
-    <div class="sticky-viewport sticky top-0 h-screen overflow-hidden flex flex-col items-start justify-center md:items-stretch">
+    <div class="sticky-viewport sticky top-0 h-dvh overflow-hidden flex flex-col items-start justify-center md:items-stretch">
       
       <!-- Static Header Overlay -->
       <div class="relative z-50 px-6 pt-12 pb-4 md:absolute md:top-12 md:left-20 md:p-0 pointer-events-none">
@@ -60,7 +60,7 @@ const experiences = [
       <!-- The Moving Train of Cards -->
       <div class="cards-train flex items-center pl-[50vw] pr-[50vw] gap-[10vw] md:gap-[20vw] flex-1 md:flex-none">
         {experiences.map((exp, index) => (
-          <div class="experience-card relative shrink-0 w-[90vw] md:w-[60vw] max-w-[800px] transition-all duration-500 ease-out p-6 md:p-12 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md">
+          <div class="experience-card relative shrink-0 w-[90vw] md:w-[60vw] max-w-[800px] transition-all duration-500 ease-out p-6 md:p-12 rounded-3xl bg-gray-900/80 border border-white/10 shadow-2xl">
             
             <!-- Glow Effect -->
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-0 card-glow transition-opacity duration-500"></div>
@@ -108,68 +108,88 @@ const experiences = [
 
     if (!container || !train) return;
 
-    function update() {
-      // 1. Get dimensions
-      const rect = container.getBoundingClientRect();
-      const containerHeight = rect.height;
-      const windowHeight = window.innerHeight;
+    // Cache metrics to avoid layout thrashing
+    let metrics = {
+      containerHeight: 0,
+      windowHeight: 0,
+      windowWidth: 0,
+      maxScroll: 0,
+      rectTop: 0
+    };
 
-      // 2. Calculate how far we are into the section
-      // The "active" scroll distance is the container height minus the viewport height
-      const maxScroll = containerHeight - windowHeight;
-      // Use negative rect.top because as we scroll down, top becomes negative. 
-      // Movement should start when top hits 0 (reaches top of viewport).
+    let animationFrameId: number | null = null;
+    let isVisible = false;
+
+    // Update metrics on resize or initial load
+    function updateMetrics() {
+      // Use getBoundingClientRect for container height to be precise
+      const rect = container.getBoundingClientRect();
+      metrics.containerHeight = rect.height; // This might change if content changes, but usually static relative to VH
+      
+      metrics.windowHeight = window.innerHeight;
+      metrics.windowWidth = window.innerWidth;
+      
+      // The "active" scroll distance
+      metrics.maxScroll = metrics.containerHeight - metrics.windowHeight;
+    }
+
+    function update() {
+      // Only run if visible
+      if (!isVisible) {
+        animationFrameId = null;
+        return;
+      }
+
+      // 1. Get current scroll position relative to container
+      // We need to read this every frame as it changes with scroll
+      const rect = container.getBoundingClientRect();
       const currentScroll = -rect.top;
 
-      // 3. Normalize progress (0 to 1)
-      // We start at 0 (top of section hits top of viewport)
-      // We end at 1 (bottom of section hits bottom of viewport)
-      let progress = currentScroll / maxScroll;
+      // 2. Normalize progress
+      // Clamp between 0 and 1
+      // Safety check for division by zero
+      if (metrics.maxScroll <= 0) {
+        requestAnimationFrame(update);
+        return;
+      }
       
-      // Clamp progress between 0 and 1
+      let progress = currentScroll / metrics.maxScroll;
       progress = Math.max(0, Math.min(progress, 1));
 
-      // 4. Move the train
-      // We calculate exact positions to center the first card at progress 0 
-      // and the last card at progress 1 (Center-to-Center scroll).
-      const firstCard = cards[0] as HTMLElement;
-      const lastCard = cards[cards.length - 1] as HTMLElement;
-
-      if (firstCard && lastCard) {
-        // Get center points of first/last cards relative to the container
+      // 3. Move the train
+      if (train && cards.length > 0) {
+        const firstCard = cards[0] as HTMLElement;
+        const lastCard = cards[cards.length - 1] as HTMLElement;
+        
+        // These offsetLeft values are relatively stable unless resize happens, 
+        // but for safety in this specific layout we read them. 
+        // Optimization: could be cached in updateMetrics if layout doesn't shift otherwise.
         const startX = firstCard.offsetLeft + (firstCard.offsetWidth / 2);
         const endX = lastCard.offsetLeft + (lastCard.offsetWidth / 2);
-        const centerScreen = window.innerWidth / 2;
+        const centerScreen = metrics.windowWidth / 2;
 
-        // Calculate the transform needed to put the card center at screen center
-        // Formula: translate = screenCenter - cardX
         const startTranslate = centerScreen - startX;
         const endTranslate = centerScreen - endX;
 
-        // Interpolate
         const currentTranslate = startTranslate + (endTranslate - startTranslate) * progress;
         train.style.transform = `translateX(${currentTranslate}px)`;
       }
 
-      // 5. Update Card Focus
-      const centerScreen = window.innerWidth / 2;
+      // 4. Update Card Focus
+      const centerScreen = metrics.windowWidth / 2;
       
       cards.forEach((card) => {
         const rect = card.getBoundingClientRect();
         const cardCenter = rect.left + rect.width / 2;
         const distFromCenter = Math.abs(centerScreen - cardCenter);
         
-        // Scale: 1 at center, 0.8 at edges
-        // Opacity: 1 at center, 0.3 at edges
-        // The divisor (500) controls how "wide" the focus area is
-        let intensity = 1 - (distFromCenter / window.innerWidth);
-        intensity = Math.max(0, Math.min(intensity, 1)); // Clamp 0-1
+        let intensity = 1 - (distFromCenter / metrics.windowWidth);
+        intensity = Math.max(0, Math.min(intensity, 1));
         
-        // Non-linear ease for sharper focus
         const ease = intensity * intensity; 
         
-        const scale = 0.8 + (0.3 * ease); // Range 0.8 -> 1.1
-        const opacity = 0.3 + (0.7 * ease); // Range 0.3 -> 1.0
+        const scale = 0.8 + (0.3 * ease);
+        const opacity = 0.3 + (0.7 * ease);
 
         (card as HTMLElement).style.transform = `scale(${scale})`;
         (card as HTMLElement).style.opacity = `${opacity}`;
@@ -181,31 +201,59 @@ const experiences = [
         }
       });
 
-      requestAnimationFrame(update);
+      animationFrameId = requestAnimationFrame(update);
     }
-    
-    // Create an observer to only run the loop when visible 
-    // (Optimization: stop loop when not scrolling or off-screen)
-    // For simplicity and smoothness, we run raf loop constantly, 
-    // but in production you might want to throttle this.
-    update();
+
+    function startLoop() {
+      if (!animationFrameId && isVisible) {
+        update();
+      }
+    }
+
+    // Initialize metrics
+    updateMetrics();
+
+    // Intersection Observer to stop the loop when element is not in view
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          startLoop();
+        } 
+        // If not visible, the loop will naturally stop at the next update() call's check
+      });
+    }, { threshold: 0 }); // Trigger as soon as 1px is visible
+
+    observer.observe(container);
+
+    // Resize listener: just update metrics
+    window.addEventListener('resize', () => {
+      updateMetrics();
+      // Force one update pass to correct positions immediately
+      if (!animationFrameId && isVisible) startLoop();
+    });
   }
 
-  // Run immediately and re-run on resize for robustness
-  initExperience();
-  window.addEventListener('resize', initExperience);
+  // Defer initialization to avoid blocking initial paint
+  // especially on low-powered devices
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initExperience);
+  } else {
+    // If already loaded, still defer slightly to next frame
+    requestAnimationFrame(initExperience);
+  }
 </script>
 
 <style>
   .cards-train {
-    /* Critical: Use 'will-change' to tell browser to optimize for transform */
-    will-change: transform;
-    /* Ensure no transition on transform to keep it 1:1 with scroll */
+    /* Optimization: Removed will-change to prevent excessive memory usage on iOS */
+    /* will-change: transform; - causes layer explosion with wide containers */
     transition: none; 
   }
   
   .experience-card {
-    will-change: transform, opacity;
+    /* Optimization: Removed will-change to prevent excessive memory usage on iOS */
+    /* will-change: transform, opacity; */
     /* Smooth out the scale/opacity changes slightly */
     transition: transform 0.1s ease-out, opacity 0.1s ease-out; 
   }
