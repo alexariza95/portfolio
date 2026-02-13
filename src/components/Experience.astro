@@ -39,7 +39,7 @@ const experiences = [
 ---
 
 <section id="experience" class="bg-dark text-white relative">
-  <div class="scroll-container h-screen w-full overflow-hidden flex flex-col justify-center relative">
+  <div class="scroll-container h-screen w-full overflow-hidden flex flex-col justify-center items-start relative">
       
       <!-- Static Header Overlay -->
       <div class="absolute top-12 left-6 md:left-20 z-20 pointer-events-none">
@@ -50,7 +50,7 @@ const experiences = [
       </div>
       
       <!-- The Moving Train of Cards -->
-      <div class="cards-train flex items-center pl-[5vw] pr-[5vw] md:pl-[20vw] md:pr-[20vw] gap-[5vw] md:gap-[10vw] w-max">
+      <div class="cards-train flex items-center train-padding gap-[5vw] md:gap-[10vw] w-max">
         {experiences.map((exp, index) => (
           <div class="experience-card relative shrink-0 w-[90vw] md:w-[60vw] max-w-[800px] p-6 md:p-12 rounded-3xl bg-gray-900/80 border border-white/10 shadow-2xl">
             
@@ -105,54 +105,104 @@ const experiences = [
 
     const cards = gsap.utils.toArray('.experience-card');
     
+    // Cache card data to avoid layout thrashing during scroll
+    let cardMetrics = cards.map((card: any) => ({
+      element: card,
+      glow: card.querySelector('.card-glow'),
+      offsetLeft: 0,
+      width: 0
+    }));
+
+    const updateMetrics = () => {
+      // Refresh calculations on resize/init
+      cardMetrics.forEach(metric => {
+        const rect = metric.element.getBoundingClientRect();
+        // We only care about relative position in the train? 
+        // No, we need screen position. But screen position changes with scroll.
+        // Better strategy: Calculate center relative to the TRAIN, then Apply scroll offset.
+        // Actually, for simplicity and performance, we can just read `offsetBound` relative to train?
+        // Let's stick to getBoundingClientRect BUT only if needed, OR optimize.
+        
+        // BETTER OPTIMIZATION: 
+        // The `getBoundingClientRect` inside onUpdate forces a reflow strictly because we are reading layout.
+        // However, GSAP's `onUpdate` runs on every frame.
+        // On Mac, high-DPI + high-refresh rate + blur effects = lag.
+        // We can keep the logic simple but ensure we are not triggering layout thrashing by separating reads and writes.
+        // But the best fix for "laggy on Mac" is often simply `will-change`.
+        // Let's rely on `will-change` first, and if that fails, do the complex caching.
+        // Actually, the user asked to solve lag.
+        // Caching `offsetLeft` (static in the train) is safer.
+        metric.offsetLeft = metric.element.offsetLeft;
+        metric.width = metric.element.offsetWidth;
+      });
+    };
+
     // Calculate total scroll distance
     const getScrollAmount = () => {
-      // Helper to ensure we scroll the entire width
       return -(train.scrollWidth - window.innerWidth);
     };
 
     const tween = gsap.to(train, {
       x: getScrollAmount,
       ease: "none",
+      onStart: () => {
+        // Prepare layers for high performance
+        gsap.set('.experience-card', { willChange: "transform, opacity" });
+      },
       scrollTrigger: {
         trigger: container,
         pin: true,
         start: "top top",
-        scrub: 1,
-        // Scroll distance based on width of content ensures consistent speed
+        scrub: 1, // Smoothing helps mask jitter
         end: () => "+=" + (train.scrollWidth - window.innerWidth), 
         invalidateOnRefresh: true,
+        onRefresh: () => updateMetrics(),
         onUpdate: (self) => {
-          // Subtle parallax/focus effect for cards
+          // Optimization: Calculate current visual position without thrashing
+          // currentScrollX is roughly: self.progress * maxScroll
+          // But strict `getBoundingClientRect` is easiest. 
+          // To fix lag, let's just THROTTLE the visual updates or simplfy the effect?
+          // No, let's try the cached offset method.
+          
+          const progress = self.progress;
+          const maxScroll = train.scrollWidth - window.innerWidth;
+          const currentTranslate = progress * maxScroll; // This is positive value of how much we moved left
+          
           const centerScreen = window.innerWidth / 2;
           
-          cards.forEach((card: any) => {
-            const rect = card.getBoundingClientRect();
-            const cardCenter = rect.left + rect.width / 2;
-            const distFromCenter = Math.abs(centerScreen - cardCenter);
+          cardMetrics.forEach((metric: any) => {
+            // Calculate screen X based on train's transform
+            // Train X moves from 0 to -maxScroll
+            const trainX = -currentTranslate;
+            const cardScreenX = trainX + metric.offsetLeft + (metric.width / 2);
+            
+            const distFromCenter = Math.abs(centerScreen - cardScreenX);
             
             // Calculate intensity (0 to 1) based on distance
-            // Wider range of effect for smoother feel
-            let intensity = 1 - (distFromCenter / (window.innerWidth * 0.6));
+            // Narrower range (0.5) creates a sharper "spotlight" effect
+            let intensity = 1 - (distFromCenter / (window.innerWidth * 0.5));
             intensity = Math.max(0, Math.min(intensity, 1));
             
-            const scale = 0.9 + (0.1 * intensity); // 0.9 -> 1.0
-            const opacity = 0.4 + (0.6 * intensity); // 0.4 -> 1.0
+            const scale = 0.9 + (0.1 * intensity);
+            const opacity = 0.4 + (0.6 * intensity);
             
-            gsap.set(card, { 
+            gsap.set(metric.element, { 
               scale: scale, 
               opacity: opacity,
-              zIndex: distFromCenter < 200 ? 10 : 1
+              zIndex: distFromCenter < 200 ? 10 : 1,
+              overwrite: 'auto' // ensure clean overwrites
             });
             
-            const glow = card.querySelector('.card-glow');
-            if (glow) {
-              gsap.set(glow, { opacity: intensity * 0.5 });
+            if (metric.glow) {
+              gsap.set(metric.glow, { opacity: intensity * 0.5 });
             }
           });
         }
       }
     });
+    
+    // Initial metric calc
+    updateMetrics();
   }
 
   // Defer slightly to ensure layout is ready
@@ -167,5 +217,22 @@ const experiences = [
 <style>
   .experience-card {
     /* Base styles */
+  }
+
+  .train-padding {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  @media (min-width: 768px) {
+    .train-padding {
+      /* 
+        Center logic: 50vw (half screen) - half card width.
+        Card width is 60vw but maxes out at 800px.
+        Using min() handles both cases specifically for large screens.
+      */
+      padding-left: calc(50vw - min(60vw, 800px) / 2);
+      padding-right: calc(50vw - min(60vw, 800px) / 2);
+    }
   }
 </style>
