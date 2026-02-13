@@ -52,18 +52,20 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         <!-- Header -->
         <div class="text-center mb-24 pt-12">
             <h2
-                class="text-primary font-medium tracking-widest uppercase mb-2 text-xs md:text-sm md:mb-4"
+                class="text-primary font-medium tracking-widest uppercase mb-2 text-xs md:text-sm md:mb-4 animate-on-scroll"
             >
                 Beyond the Code
             </h2>
-            <p class="font-display text-4xl md:text-6xl font-bold pb-2">
+            <p
+                class="font-display text-4xl md:text-6xl font-bold pb-2 animate-on-scroll"
+            >
                 Engineering with <span
                     class="text-transparent bg-clip-text bg-linear-to-r from-white to-gray-500"
                     >Purpose</span
                 >
             </p>
             <p
-                class="mt-6 text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed"
+                class="mt-6 text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed animate-on-scroll delay-100"
             >
                 I believe that great software is the intersection of solid
                 architecture, business value, and user experience.
@@ -74,7 +76,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             <!-- Card 1 -->
             <div
-                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm animate-on-scroll delay-100"
             >
                 <div
                     class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
@@ -102,7 +104,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
             <!-- Card 2 -->
             <div
-                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm animate-on-scroll delay-200"
             >
                 <div
                     class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
@@ -130,7 +132,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 
             <!-- Card 3 -->
             <div
-                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm animate-on-scroll delay-300"
             >
                 <div
                     class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
@@ -165,9 +167,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
             class="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-white"
         >
             Ready to build something <span
+                id="typewriter"
                 class="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-purple-400"
                 >scalable?</span
-            >
+            ><span class="text-indigo-400 animate-blink ml-1">|</span>
         </h2>
         <p class="text-slate-400 mb-10 text-lg">
             Let's discuss how I can help your team.
@@ -221,7 +224,105 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     </div>
 </div>
 
+<script>
+    function initPhilosophyAnimations() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px",
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("in-view");
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+            observer.observe(el);
+        });
+    }
+
+    function initTypewriter() {
+        const textElement = document.getElementById("typewriter");
+        if (!textElement) return;
+
+        const words = ["scalable?", "secure?", "performant?", "impactful?"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 100;
+
+        function type() {
+            const currentWord = words[wordIndex];
+
+            if (isDeleting) {
+                textElement!.textContent = currentWord.substring(
+                    0,
+                    charIndex - 1,
+                );
+                charIndex--;
+                typeSpeed = 50; // Deleting speed
+            } else {
+                textElement!.textContent = currentWord.substring(
+                    0,
+                    charIndex + 1,
+                );
+                charIndex++;
+                typeSpeed = 150; // Typing speed
+            }
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                typeSpeed = 2000; // Pause at end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500; // Pause before new word
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+
+        type();
+    }
+
+    // Run immediately
+    initPhilosophyAnimations();
+    // Start typewriter when ready
+    document.addEventListener("DOMContentLoaded", initTypewriter);
+    // Fallback if already loaded
+    if (
+        document.readyState === "complete" ||
+        document.readyState === "interactive"
+    ) {
+        initTypewriter();
+    }
+</script>
+
 <style>
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .animate-on-scroll.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .delay-100 {
+        transition-delay: 100ms;
+    }
+    .delay-200 {
+        transition-delay: 200ms;
+    }
+    .delay-300 {
+        transition-delay: 300ms;
+    }
+
     .cube-container {
         width: 200px;
         height: 200px;
@@ -317,5 +418,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
         100% {
             transform: rotateX(0deg) rotateY(360deg);
         }
+    }
+
+    @keyframes blink {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .animate-blink {
+        animation: blink 1s step-end infinite;
     }
 </style>
