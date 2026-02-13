@@ -1,0 +1,320 @@
+---
+import {
+    Target,
+    Zap,
+    Layers,
+    ArrowRight,
+    Linkedin,
+    Github,
+} from "lucide-react";
+const currentYear = new Date().getFullYear();
+
+// Frontmatter variable to handle base URL if needed, similar to other components
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<div
+    class="w-full bg-[#0B0C15] text-white py-24 px-6 md:px-12 relative overflow-hidden perspective-1000"
+>
+    <!-- BACKGROUND ANIMATION -->
+    <div
+        class="absolute top-20 left-1/2 -translate-x-1/2 opacity-40 pointer-events-none z-0"
+    >
+        <div class="cube-container">
+            <!-- Outer Cube (Structure) -->
+            <div class="cube-face face-1"></div>
+            <div class="cube-face face-2"></div>
+            <div class="cube-face face-3"></div>
+            <div class="cube-face face-4"></div>
+            <div class="cube-face face-5"></div>
+            <div class="cube-face face-6"></div>
+
+            <!-- Inner Cube (Core) -->
+            <div class="inner-cube">
+                <div class="inner-face if-1"></div>
+                <div class="inner-face if-2"></div>
+                <div class="inner-face if-3"></div>
+                <div class="inner-face if-4"></div>
+                <div class="inner-face if-5"></div>
+                <div class="inner-face if-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gradient Glow -->
+    <div
+        class="absolute top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-900/30 rounded-full blur-[100px] pointer-events-none z-0"
+    >
+    </div>
+
+    <!-- CONTENT -->
+    <div class="max-w-6xl mx-auto relative z-10 mb-32">
+        <!-- Header -->
+        <div class="text-center mb-24 pt-12">
+            <span
+                class="text-indigo-400 font-semibold tracking-wider text-sm uppercase mb-2 block"
+            >
+                Beyond the Code
+            </span>
+            <h2
+                class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-white via-slate-200 to-slate-500 pb-2"
+            >
+                Engineering with Purpose
+            </h2>
+            <p
+                class="mt-6 text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed"
+            >
+                I believe that great software is the intersection of solid
+                architecture, business value, and user experience.
+            </p>
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            <!-- Card 1 -->
+            <div
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+            >
+                <div
+                    class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-slate-700 group-hover:border-indigo-500/30 shadow-lg text-indigo-400"
+                    >
+                        <Target className="w-6 h-6" />
+                    </div>
+                    <h3
+                        class="text-xl font-bold text-white mb-3 group-hover:text-indigo-200 transition-colors"
+                    >
+                        Impact Over Complexity
+                    </h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">
+                        I don't just write code; I solve business problems.
+                        Every architectural decision in Azure is measured by the
+                        value it delivers to the product, not just by technical
+                        novelty.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+            >
+                <div
+                    class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-slate-700 group-hover:border-indigo-500/30 shadow-lg text-purple-400"
+                    >
+                        <Zap className="w-6 h-6" />
+                    </div>
+                    <h3
+                        class="text-xl font-bold text-white mb-3 group-hover:text-indigo-200 transition-colors"
+                    >
+                        Performance is UX
+                    </h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">
+                        A slow application is a broken application. I focus on
+                        optimizing backend latency and reactivity because
+                        technical performance directly impacts user retention
+                        and revenue.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+                class="group p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-300 relative overflow-hidden backdrop-blur-sm"
+            >
+                <div
+                    class="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                </div>
+                <div class="relative z-10">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-slate-700 group-hover:border-indigo-500/30 shadow-lg text-blue-400"
+                    >
+                        <Layers className="w-6 h-6" />
+                    </div>
+                    <h3
+                        class="text-xl font-bold text-white mb-3 group-hover:text-indigo-200 transition-colors"
+                    >
+                        Built for Growth
+                    </h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">
+                        I design systems ready for tomorrow. Using clean
+                        architecture and cloud-native patterns, I ensure the
+                        software is maintainable, testable, and ready to scale.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER / CTA FINAL -->
+    <div
+        class="max-w-4xl mx-auto text-center border-t border-slate-800/60 pt-24 relative z-10"
+    >
+        <h2
+            class="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-white"
+        >
+            Ready to build something <span
+                class="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-purple-400"
+                >scalable?</span
+            >
+        </h2>
+        <p class="text-slate-400 mb-10 text-lg">
+            Let's discuss how I can help your team.
+        </p>
+
+        <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+        >
+            <a
+                href="mailto:alejandro.ariza.gener@gmail.com"
+                class="group px-8 py-4 bg-white text-slate-900 rounded-full font-semibold hover:bg-slate-200 transition-all flex items-center gap-2"
+            >
+                Let's Talk
+                <ArrowRight
+                    className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                />
+            </a>
+
+            <a
+                href={`${base}/docs/Alex_Ariza_SSE.pdf`}
+                download
+                class="px-8 py-4 border border-slate-700 text-slate-300 rounded-full font-medium hover:border-slate-500 hover:text-white transition-all"
+            >
+                Download CV
+            </a>
+        </div>
+
+        <!-- Social Links -->
+        <div class="flex justify-center gap-8 text-slate-500">
+            <a
+                href="https://www.linkedin.com/in/alexariza95/"
+                class="hover:text-indigo-400 transition-colors flex items-center gap-2"
+                target="_blank"
+            >
+                <Linkedin className="w-5 h-5" />
+                <span class="hidden sm:inline">LinkedIn</span>
+            </a>
+            <a
+                href="https://github.com/alexariza95"
+                class="hover:text-white transition-colors flex items-center gap-2"
+                target="_blank"
+            >
+                <Github className="w-5 h-5" />
+                <span class="hidden sm:inline">GitHub</span>
+            </a>
+        </div>
+
+        <div class="mt-12 text-slate-600 text-sm">
+            © {currentYear} Alex Ariza. Built with Astro, Tailwind & TypeScript.
+        </div>
+    </div>
+</div>
+
+<style>
+    .cube-container {
+        width: 200px;
+        height: 200px;
+        transform-style: preserve-3d;
+        animation: rotate 20s infinite linear;
+    }
+
+    .cube-face {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border: 2px solid rgba(129, 140, 248, 0.3); /* Indigo */
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+        background: rgba(15, 23, 42, 0.2);
+        backdrop-filter: blur(2px);
+    }
+
+    /* Front/Back */
+    .face-1 {
+        transform: translateZ(100px);
+    }
+    .face-2 {
+        transform: rotateY(180deg) translateZ(100px);
+    }
+
+    /* Right/Left */
+    .face-3 {
+        transform: rotateY(90deg) translateZ(100px);
+    }
+    .face-4 {
+        transform: rotateY(-90deg) translateZ(100px);
+    }
+
+    /* Top/Bottom */
+    .face-5 {
+        transform: rotateX(90deg) translateZ(100px);
+    }
+    .face-6 {
+        transform: rotateX(-90deg) translateZ(100px);
+    }
+
+    /* Inner Cube (More opacity) */
+    .inner-cube {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        transform-style: preserve-3d;
+        animation: rotate-reverse 15s infinite linear;
+    }
+
+    .inner-face {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border: 1px solid rgba(192, 132, 252, 0.5); /* Purple */
+        background: rgba(192, 132, 252, 0.05);
+    }
+
+    .if-1 {
+        transform: translateZ(50px);
+    }
+    .if-2 {
+        transform: rotateY(180deg) translateZ(50px);
+    }
+    .if-3 {
+        transform: rotateY(90deg) translateZ(50px);
+    }
+    .if-4 {
+        transform: rotateY(-90deg) translateZ(50px);
+    }
+    .if-5 {
+        transform: rotateX(90deg) translateZ(50px);
+    }
+    .if-6 {
+        transform: rotateX(-90deg) translateZ(50px);
+    }
+
+    @keyframes rotate {
+        0% {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+        100% {
+            transform: rotateX(360deg) rotateY(360deg);
+        }
+    }
+
+    @keyframes rotate-reverse {
+        0% {
+            transform: rotateX(360deg) rotateY(0deg);
+        }
+        100% {
+            transform: rotateX(0deg) rotateY(360deg);
+        }
+    }
+</style>
