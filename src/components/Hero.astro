@@ -23,7 +23,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     </div>
   </div>
 
-  <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+  <div
+    id="hero-content"
+    class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center"
+  >
     <div
       class="backdrop-blur-sm bg-dark/10 rounded-3xl p-8 md:p-12 border border-white/5 shadow-2xl shadow-black/20 animate-on-scroll"
     >
@@ -80,10 +83,32 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   </div>
 </section>
 
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero Exit Animation
+  // Replaces the CSS scroll-driven animation for better cross-browser support
+  gsap.to("#hero-content", {
+    scrollTrigger: {
+      trigger: "#hero-section",
+      start: "top top",
+      end: "bottom 30%", // Fade out as we scroll down
+      scrub: 1,
+    },
+    y: 100,
+    scale: 0.9,
+    opacity: 0,
+    filter: "blur(10px)",
+  });
+
+  // Optional: We can also animate the blobs with GSAP for smoother random movement
+  // but CSS keyframes are usually fine.
+</script>
+
 <style>
-  #hero-section {
-    view-timeline-name: --hero;
-  }
   @keyframes blob {
     0% {
       transform: translate(0px, 0px) scale(1);
@@ -106,25 +131,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   }
   .animation-delay-4000 {
     animation-delay: 4s;
-  }
-
-  /* Scroll Driven Animation */
-  @keyframes hero-exit {
-    to {
-      transform: translateY(-50px) scale(0.9);
-      opacity: 0;
-      filter: blur(10px);
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .animate-on-scroll {
-        animation: hero-exit linear forwards;
-        animation-timeline: --hero;
-        animation-range: exit 0% exit 50%;
-      }
-    }
   }
 
   @keyframes fadeInUp {
