@@ -1,5 +1,6 @@
 ---
 // Creating a high-impact Hero component
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
 <section
@@ -65,7 +66,7 @@
             My Journey
           </a>
           <a
-            href={`${import.meta.env.BASE_URL}docs/Alex_Ariza_SSE.pdf`}
+            href={`${base}/docs/Alex_Ariza_SSE.pdf`}
             download="Alex_Ariza_Senior_Software_Engineer.pdf"
             target="_blank"
             rel="noopener noreferrer"
